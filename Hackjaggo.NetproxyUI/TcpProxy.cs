@@ -152,17 +152,12 @@ namespace Hackjaggo.Proxy
 
         public int ConnectionTimeout { get; set; } = (4 * 60 * 1000);
 
-        public async Task Start(string remoteServerHostNameOrAddress,
-            ushort remoteServerPort,
-            ushort localPort,
-            string? localIp,
-            bool? filterIPAddressRanges = false,
-            List<string>? IPAddressRanges = null, HackjaggoProxyForm? form = null)
+        public async Task Start(ProxyConfig config, HackjaggoProxyForm? form = null)
         {
             var connections = new ConcurrentBag<TcpConnection>();
 
-            IPAddress localIpAddress = string.IsNullOrEmpty(localIp) ? IPAddress.IPv6Any : IPAddress.Parse(localIp);
-            using var localServer = new TcpListener(new IPEndPoint(localIpAddress, localPort));
+            IPAddress localIpAddress = string.IsNullOrEmpty(config.localIp) ? IPAddress.IPv6Any : IPAddress.Parse(config.localIp);
+            using var localServer = new TcpListener(new IPEndPoint(localIpAddress, config.localPort!));
             localServer.Server.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.IPv6Only, false);
             localServer.Start();
 
@@ -170,7 +165,8 @@ namespace Hackjaggo.Proxy
             await form!.AddRejectedConnectionsListViewItemAsync("46.10.8.57", 0);
             await form!.AddRejectedConnectionsListViewItemAsync("188.126.94.91", 0);
 
-            form!.routingInformationLabel.Text = $"Routing over TCP from [{localIpAddress}]:{localPort} to [{remoteServerHostNameOrAddress}]:{remoteServerPort}";
+            form!.routingInformationLabel.Text = $"Routing over TCP from [{localIpAddress}]:{config.localPort} to" +
+                $" [{config.forwardIp}]:{config.forwardPort}";
 
             var _ = Task.Run(async () =>
             {
@@ -207,15 +203,15 @@ namespace Hackjaggo.Proxy
             {
                 try
                 {
-                    var ips = await Dns.GetHostAddressesAsync(remoteServerHostNameOrAddress).ConfigureAwait(false);
+                    var ips = await Dns.GetHostAddressesAsync(config.forwardIp).ConfigureAwait(false);
 
                     var tcpConnection = await TcpConnection.AcceptTcpClientAsync(form, localServer,
-                            new IPEndPoint(ips[0], remoteServerPort)).ConfigureAwait(false);
+                            new IPEndPoint(ips[0], config.forwardPort)).ConfigureAwait(false);
 
                     var remoteEndPoint = tcpConnection._localServerConnection.Client.RemoteEndPoint as IPEndPoint;
 
-                    bool filterAddresses = filterIPAddressRanges != null && filterIPAddressRanges == true;
-                    if (filterAddresses && IsInPrivateRanges(remoteEndPoint, IPAddressRanges!))
+                    bool filterAddresses = config.FilterIPAddressRanges == true;
+                    if (filterAddresses && IsInPrivateRanges(remoteEndPoint, config.IPAddressRanges!))
                     {
                         tcpConnection.Run(form);
                         connections.Add(tcpConnection);

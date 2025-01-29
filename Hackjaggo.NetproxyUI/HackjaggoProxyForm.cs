@@ -370,11 +370,11 @@ namespace Hackjaggo.NetproxyUI
                 {
                     throw new Exception("forwardIp is null");
                 }
-                if (!forwardPort.HasValue)
+                if (forwardPort <= 0)
                 {
                     throw new Exception("forwardPort is null");
                 }
-                if (!localPort.HasValue)
+                if (localPort <= 0)
                 {
                     throw new Exception("localPort is null");
                 }
@@ -389,12 +389,7 @@ namespace Hackjaggo.NetproxyUI
 
             try
             {
-                task = new TcpProxy().Start(forwardIp,
-                    forwardPort.Value,
-                    localPort.Value,
-                    localIp,
-                    proxyConfig.FilterIPAddressRanges,
-                    proxyConfig.IPAddressRanges,
+                task = new TcpProxy().Start(proxyConfig,
                     form);
 
             }
