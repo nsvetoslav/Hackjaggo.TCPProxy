@@ -211,17 +211,16 @@ namespace Hackjaggo.Proxy
                     var remoteEndPoint = tcpConnection._localServerConnection.Client.RemoteEndPoint as IPEndPoint;
 
                     bool filterAddresses = config.FilterIPAddressRanges == true;
-                    if (filterAddresses && IsInPrivateRanges(remoteEndPoint, config.IPAddressRanges!))
-                    {
-                        tcpConnection.Run(form);
-                        connections.Add(tcpConnection);
-                    }
-                    else
+                    if (filterAddresses && !IsInPrivateRanges(remoteEndPoint, config.IPAddressRanges!))
                     {
                         await form.AddRejectedConnectionsListViewItemAsync(remoteEndPoint!.Address.ToString(), remoteEndPoint!.Port).ConfigureAwait(false);
                         Console.Beep();
                         continue;
                     }
+
+                    tcpConnection.Run(form);
+                    connections.Add(tcpConnection);
+
                 }
                 catch (Exception)
                 {
