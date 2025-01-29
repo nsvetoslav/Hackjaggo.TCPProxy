@@ -4,11 +4,13 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Hackjaggo.Proxy;
 using System.Windows.Forms;
+using static Hackjaggo.NetproxyUI.ProxyCheck;
 
 namespace Hackjaggo.NetproxyUI
 {
     public partial class HackjaggoProxyForm : Form
     {
+        private Proxy.ProxyConfig? ProxyConfig { get; set; }
         public List<Task> RunningProxyTasks { get; private set; } = new();
 
         public CancellationTokenSource CancellationToken { get; set; } = new();
@@ -17,6 +19,7 @@ namespace Hackjaggo.NetproxyUI
         {
             public object? PrimaryObject { get; set; }
             public object? SecondaryObject { get; set; }
+            public object? TertiaryObject { get; set; }
         }
 
         public HackjaggoProxyForm()
@@ -61,6 +64,23 @@ namespace Hackjaggo.NetproxyUI
             imageList.Images.Add("warning", Image.FromFile("./Resources/icons8-warning-666.png"));
 
             rejectedConnectionsListView.SmallImageList = imageList;
+
+            this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip();
+            this.locateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.SuspendLayout();
+
+            this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.locateToolStripMenuItem});
+            this.contextMenuStrip1.Name = "contextMenuStrip1";
+            this.contextMenuStrip1.Size = new System.Drawing.Size(110, 28);
+
+            this.locateToolStripMenuItem.Name = "locateToolStripMenuItem";
+            this.locateToolStripMenuItem.Size = new System.Drawing.Size(109, 24);
+            this.locateToolStripMenuItem.Text = "Locate";
+            this.locateToolStripMenuItem.Click += new System.EventHandler(this.OnLocateIPAddress!);
+
+
+            rejectedConnectionsListView.ContextMenuStrip = contextMenuStrip1;
         }
 
         private void SetCurrentConnectionsListViewData()
@@ -122,13 +142,13 @@ namespace Hackjaggo.NetproxyUI
             try
             {
                 var configJson = File.ReadAllText("config.json");
-                Dictionary<string, Proxy.ProxyConfig>? configs = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, ProxyConfig>>(configJson);
-                if (configs == null)
+                this.ProxyConfig = System.Text.Json.JsonSerializer.Deserialize<Proxy.ProxyConfig?>(configJson);
+                if (this.ProxyConfig == null)
                 {
                     throw new Exception("configs is null");
                 }
 
-                var runningProxyTasksLocal = configs.SelectMany(c => RunProxyFromConfig(c.Key, c.Value, this));
+                var runningProxyTasksLocal = RunProxyFromConfig("", this.ProxyConfig, this);
                 RunningProxyTasks.AddRange(runningProxyTasksLocal);
 
                 await Task.WhenAll(RunningProxyTasks);
@@ -157,7 +177,12 @@ namespace Hackjaggo.NetproxyUI
                 {
                     ImageKey = isProxyAvailable ? "error" : "warning",
                     ForeColor = isProxyAvailable ? Color.FromKnownColor(KnownColor.Red) : Color.FromKnownColor(KnownColor.Green),
-                    Tag = new ListViewItemTags() { PrimaryObject = DateTime.Now, SecondaryObject = $"https://whatismyipaddress.com/ip/{ipf4addr}" },
+                    Tag = new ListViewItemTags()
+                    {
+                        PrimaryObject = DateTime.Now,
+                        SecondaryObject = $"https://whatismyipaddress.com/ip/{ipf4addr}",
+                        TertiaryObject = proxyCheckResult
+                    },
                 };
 
                 listItem.SubItems.Add(isProxyAvailable ? "YES" : "NO");
@@ -380,6 +405,21 @@ namespace Hackjaggo.NetproxyUI
             }
 
             yield return task;
+        }
+
+        private void OnLocateIPAddress(object sender, EventArgs e)
+        {
+            ListViewItem selectedItem = rejectedConnectionsListView.SelectedItems[0];
+
+            if (selectedItem.Tag is ListViewItemTags tag)
+            {
+                if (tag.TertiaryObject is IpInfoDetails ipInfoDetails)
+                {
+                    GoogleMapsForm googleMapsForm = new GoogleMapsForm(ipInfoDetails.Longitude, ipInfoDetails.Latitude, this.ProxyConfig!.GoogleAPIKey);
+
+                    googleMapsForm.ShowDialog();
+                }
+            }
         }
     }
 }

@@ -14,5 +14,6 @@ namespace Hackjaggo.Proxy
         public ushort? forwardPort { get; set; }
         public bool FilterIPAddressRanges { get; set; }
         public List<string> IPAddressRanges { get; set; } = new();
+        public string GoogleAPIKey { get; set; } = string.Empty;
     }
 }

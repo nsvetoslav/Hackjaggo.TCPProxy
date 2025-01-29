@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="IPAddressRange" Version="6.1.0" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3079-prerelease" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 

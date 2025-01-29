@@ -60,7 +60,7 @@
             currentConnectionsListView.LabelEdit = true;
             currentConnectionsListView.Location = new Point(12, 55);
             currentConnectionsListView.Name = "currentConnectionsListView";
-            currentConnectionsListView.Size = new Size(536, 373);
+            currentConnectionsListView.Size = new Size(536, 395);
             currentConnectionsListView.TabIndex = 1;
             currentConnectionsListView.UseCompatibleStateImageBehavior = false;
             currentConnectionsListView.View = View.Details;
@@ -74,7 +74,7 @@
             rejectedConnectionsListView.LabelEdit = true;
             rejectedConnectionsListView.Location = new Point(554, 55);
             rejectedConnectionsListView.Name = "rejectedConnectionsListView";
-            rejectedConnectionsListView.Size = new Size(530, 373);
+            rejectedConnectionsListView.Size = new Size(547, 395);
             rejectedConnectionsListView.TabIndex = 2;
             rejectedConnectionsListView.UseCompatibleStateImageBehavior = false;
             rejectedConnectionsListView.View = View.Details;
@@ -103,7 +103,7 @@
             // button1
             // 
             button1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            button1.Location = new Point(1009, 29);
+            button1.Location = new Point(1026, 29);
             button1.Name = "button1";
             button1.Size = new Size(75, 23);
             button1.TabIndex = 5;
@@ -131,11 +131,11 @@
             startStopButton.UseVisualStyleBackColor = true;
             startStopButton.Click += startStopButton_ClickAsync;
             // 
-            // pictureBox1
+            // statusPictureBox
             // 
             statusPictureBox.InitialImage = null;
             statusPictureBox.Location = new Point(10, 11);
-            statusPictureBox.Name = "pictureBox1";
+            statusPictureBox.Name = "statusPictureBox";
             statusPictureBox.Size = new Size(16, 16);
             statusPictureBox.TabIndex = 8;
             statusPictureBox.TabStop = false;
@@ -146,7 +146,7 @@
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;
             BackgroundImageLayout = ImageLayout.None;
-            ClientSize = new Size(1096, 450);
+            ClientSize = new Size(1113, 472);
             Controls.Add(statusPictureBox);
             Controls.Add(startStopButton);
             Controls.Add(Clear);
@@ -176,5 +176,7 @@
         public Button Clear;
         public Button startStopButton;
         public PictureBox statusPictureBox;
+        private ContextMenuStrip contextMenuStrip1;
+        private ToolStripMenuItem locateToolStripMenuItem;
     }
 }
