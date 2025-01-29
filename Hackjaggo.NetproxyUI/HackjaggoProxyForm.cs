@@ -379,9 +379,9 @@ namespace Hackjaggo.NetproxyUI
                     throw new Exception("localPort is null");
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                //Console.WriteLine($"Failed to start {proxyName} : {ex.Message}");
+                Logger.LogError($"Failed to start {proxyName} : {ex.Message}");
                 throw;
             }
 
@@ -393,9 +393,9 @@ namespace Hackjaggo.NetproxyUI
                     form);
 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                //Console.WriteLine($"Failed to start {proxyName} : {ex.Message}");
+                Logger.LogError($"Failed to start {proxyName} : {ex.Message}");
                 throw;
             }
 

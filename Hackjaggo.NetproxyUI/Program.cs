@@ -1,3 +1,5 @@
+using Hackjaggo.Proxy;
+
 namespace Hackjaggo.NetproxyUI
 {
     internal static class Program
@@ -6,6 +8,7 @@ namespace Hackjaggo.NetproxyUI
         static void Main()
         {
             ApplicationConfiguration.Initialize();
+            Logger.LogInfo("Test");
             Application.Run(new HackjaggoProxyForm());
         }
     }

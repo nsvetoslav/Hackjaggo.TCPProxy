@@ -53,9 +53,9 @@ namespace Hackjaggo.Proxy
                 {
                     _cancellationTokenSource.Cancel();
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    //Console.WriteLine($"An exception occurred while closing TcpConnection : {ex}");
+                    Logger.LogError($"An exception occurred while closing TcpConnection: {ex}");
                 }
             }
 
@@ -76,7 +76,7 @@ namespace Hackjaggo.Proxy
                                 await _forwardClient.ConnectAsync(_remoteEndpoint.Address, _remoteEndpoint.Port, cancellationToken).ConfigureAwait(false);
                                 _forwardLocalEndpoint = _forwardClient.Client.LocalEndPoint;
 
-                                //Console.WriteLine($"Established TCP {_sourceEndpoint} => {_serverLocalEndpoint} => {_forwardLocalEndpoint} => {_remoteEndpoint}");
+                                //Logger.LogInfo($"Established TCP {_sourceEndpoint} => {_serverLocalEndpoint} => {_forwardLocalEndpoint} => {_remoteEndpoint}");
 
                                 using (var serverStream = _forwardClient.GetStream())
                                 using (var clientStream = _localServerConnection.GetStream())
@@ -86,9 +86,9 @@ namespace Hackjaggo.Proxy
                                     ).ConfigureAwait(false);
                             }
                         }
-                        catch (Exception)
+                        catch (Exception ex)
                         {
-                            //Console.WriteLine($"An exception occurred during TCP stream : {ex}");
+                            Logger.LogError($"An exception occurred during TCP stream : {ex}");
                             using (_localServerConnection)
                             {
                                 var remoteEndPoint = _localServerConnection.Client.RemoteEndPoint as IPEndPoint;
