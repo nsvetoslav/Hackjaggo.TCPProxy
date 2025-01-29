@@ -4,6 +4,8 @@ namespace Hackjaggo.NetproxyUI
 {
     public class ProxyCheck
     {
+        private static Dictionary<string, IpInfoDetails> _ipInfoCache = new();
+
         public class IpInfoDetails
         {
             public string Asn { get; set; } = string.Empty;
@@ -40,8 +42,13 @@ namespace Hackjaggo.NetproxyUI
             public int Subnet { get; set; }
         }
 
-        public async Task<IpInfoDetails> GetProxyInfoAsync(string ipAddress)
+        public async Task<IpInfoDetails?> GetProxyInfoAsync(string ipAddress)
         {
+            IpInfoDetails? ipInfoDetails = null;
+
+            if (_ipInfoCache.TryGetValue(ipAddress, out ipInfoDetails))
+                return ipInfoDetails;
+
             try
             {
                 string url = $"https://proxycheck.io/v2/{ipAddress}?vpn=1&asn=1";
@@ -54,16 +61,17 @@ namespace Hackjaggo.NetproxyUI
 
                     if (jsonResponse["status"]?.ToString() == "ok" && jsonResponse[ipAddress] != null)
                     {
-                        var ipDetails = jsonResponse![ipAddress]!.ToObject<IpInfoDetails>();
-                        return ipDetails!;
+                        ipInfoDetails = jsonResponse![ipAddress]!.ToObject<IpInfoDetails>()!;
+                        _ipInfoCache.TryAdd(ipAddress, ipInfoDetails);
+                        return ipInfoDetails!;
                     }
 
-                    return null!;
+                    return ipInfoDetails;
                 }
             }
             catch (Exception)
             {
-                return null!;
+                return ipInfoDetails;
             }
         }
     }
