@@ -222,8 +222,9 @@ namespace Hackjaggo.Proxy
                     connections.Add(tcpConnection);
 
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    Logger.LogError($"Exception: {ex.Message}");
                 }
             }
 

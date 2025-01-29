@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Hackjaggo.Proxy;
+using Newtonsoft.Json.Linq;
 
 namespace Hackjaggo.NetproxyUI
 {
@@ -66,11 +67,14 @@ namespace Hackjaggo.NetproxyUI
                         return ipInfoDetails!;
                     }
 
+                    Logger.LogInfo($"ProxyCheck failed for IP: {ipAddress}");
+
                     return ipInfoDetails;
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Logger.LogError($"Exception: {ex.Message}");
                 return ipInfoDetails;
             }
         }

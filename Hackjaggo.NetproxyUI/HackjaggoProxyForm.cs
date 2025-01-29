@@ -161,39 +161,46 @@ namespace Hackjaggo.NetproxyUI
 
         public async Task AddRejectedConnectionsListViewItemAsync(string ipAddress, int port)
         {
-            if (rejectedConnectionsListView.InvokeRequired)
+            try
             {
-                rejectedConnectionsListView.Invoke(new Action(() => AddRejectedConnectionsListViewItemAsync(ipAddress, port).ConfigureAwait(false)));
-            }
-            else
-            {
-                var proxyChecker = new ProxyCheck();
-                var ipf4addr = IPAddress.Parse(ipAddress).MapToIPv4().ToString();
-                var proxyCheckResult = await proxyChecker.GetProxyInfoAsync(ipf4addr);
-                var isProxyAvailable = proxyCheckResult != null && proxyCheckResult.Proxy.Contains("yes");
-
-                var datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-                var listItem = new ListViewItem(datetime)
+                if (rejectedConnectionsListView.InvokeRequired)
                 {
-                    ImageKey = isProxyAvailable ? "error" : "warning",
-                    ForeColor = isProxyAvailable ? Color.FromKnownColor(KnownColor.Red) : Color.FromKnownColor(KnownColor.Green),
-                    Tag = new ListViewItemTags()
+                    rejectedConnectionsListView.Invoke(new Action(() => AddRejectedConnectionsListViewItemAsync(ipAddress, port).ConfigureAwait(false)));
+                }
+                else
+                {
+                    var proxyChecker = new ProxyCheck();
+                    var ipf4addr = IPAddress.Parse(ipAddress).MapToIPv4().ToString();
+                    var proxyCheckResult = await proxyChecker.GetProxyInfoAsync(ipf4addr);
+                    var isProxyAvailable = proxyCheckResult != null && proxyCheckResult.Proxy.Contains("yes");
+
+                    var datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                    var listItem = new ListViewItem(datetime)
                     {
-                        PrimaryObject = DateTime.Now,
-                        SecondaryObject = $"https://whatismyipaddress.com/ip/{ipf4addr}",
-                        TertiaryObject = proxyCheckResult
-                    },
-                };
+                        ImageKey = isProxyAvailable ? "error" : "warning",
+                        ForeColor = isProxyAvailable ? Color.FromKnownColor(KnownColor.Red) : Color.FromKnownColor(KnownColor.Green),
+                        Tag = new ListViewItemTags()
+                        {
+                            PrimaryObject = DateTime.Now,
+                            SecondaryObject = $"https://whatismyipaddress.com/ip/{ipf4addr}",
+                            TertiaryObject = proxyCheckResult
+                        },
+                    };
 
-                listItem.SubItems.Add(isProxyAvailable ? "YES" : "NO");
-                listItem.SubItems.Add(ipAddress);
-                listItem.SubItems.Add(port.ToString());
+                    listItem.SubItems.Add(isProxyAvailable ? "YES" : "NO");
+                    listItem.SubItems.Add(ipAddress);
+                    listItem.SubItems.Add(port.ToString());
 
-                rejectedConnectionsListView.Items.Add(listItem);
+                    rejectedConnectionsListView.Items.Add(listItem);
 
-                rejectedConnectionsListView.Sort();
+                    rejectedConnectionsListView.Sort();
 
-                ResizeRejectedConnectionsListViewColumnContent();
+                    ResizeRejectedConnectionsListViewColumnContent();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError($"Exception: {ex.Message}");
             }
         }
 
@@ -219,32 +226,39 @@ namespace Hackjaggo.NetproxyUI
 
         public void AddCurrentConnectionsListView(string ipAddress, int port)
         {
-            if (currentConnectionsListView.InvokeRequired)
+            try
             {
-                currentConnectionsListView.Invoke(new Action(() => AddCurrentConnectionsListView(ipAddress, port)));
-            }
-            else
-            {
-                var datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-                var listItem = new ListViewItem(datetime)
+                if (currentConnectionsListView.InvokeRequired)
                 {
-                    Tag = new ListViewItemTags()
+                    currentConnectionsListView.Invoke(new Action(() => AddCurrentConnectionsListView(ipAddress, port)));
+                }
+                else
+                {
+                    var datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                    var listItem = new ListViewItem(datetime)
                     {
-                        PrimaryObject = DateTime.Now,
-                        SecondaryObject = null,
+                        Tag = new ListViewItemTags()
+                        {
+                            PrimaryObject = DateTime.Now,
+                            SecondaryObject = null,
 
-                    },
-                    ImageKey = "info",
-                    ForeColor = Color.FromKnownColor(KnownColor.Green),
-                };
+                        },
+                        ImageKey = "info",
+                        ForeColor = Color.FromKnownColor(KnownColor.Green),
+                    };
 
-                listItem.SubItems.Add(ipAddress);
-                listItem.SubItems.Add(port.ToString());
+                    listItem.SubItems.Add(ipAddress);
+                    listItem.SubItems.Add(port.ToString());
 
-                currentConnectionsListView.Items.Add(listItem);
+                    currentConnectionsListView.Items.Add(listItem);
 
-                ResizeCurrentConnectionsListViewColumnContent();
-                currentConnectionsListView.Sort();
+                    ResizeCurrentConnectionsListViewColumnContent();
+                    currentConnectionsListView.Sort();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError($"Exception: {ex.Message}");
             }
         }
 
@@ -273,20 +287,24 @@ namespace Hackjaggo.NetproxyUI
 
         private void RejectedConnectionsListView_ItemActivate(object sender, EventArgs e)
         {
-            // Get the selected item
-            ListViewItem selectedItem = rejectedConnectionsListView.SelectedItems[0];
-
-            // Retrieve the URL stored in the Tag property
-            if (selectedItem.Tag is ListViewItemTags tag)
+            try
             {
-                if (tag.SecondaryObject is string addr)
+                ListViewItem selectedItem = rejectedConnectionsListView.SelectedItems[0];
+
+                if (selectedItem.Tag is ListViewItemTags tag)
                 {
-                    if (!string.IsNullOrEmpty(addr))
+                    if (tag.SecondaryObject is string addr)
                     {
-                        // Open the URL in the default web browser
-                        OpenUrl(addr);
+                        if (!string.IsNullOrEmpty(addr))
+                        {
+                            OpenUrl(addr);
+                        }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError($"Exception: {ex.Message}");
             }
         }
 
@@ -404,16 +422,23 @@ namespace Hackjaggo.NetproxyUI
 
         private void OnLocateIPAddress(object sender, EventArgs e)
         {
-            ListViewItem selectedItem = rejectedConnectionsListView.SelectedItems[0];
-
-            if (selectedItem.Tag is ListViewItemTags tag)
+            try
             {
-                if (tag.TertiaryObject is IpInfoDetails ipInfoDetails)
-                {
-                    GoogleMapsForm googleMapsForm = new GoogleMapsForm(ipInfoDetails.Longitude, ipInfoDetails.Latitude, this.ProxyConfig!.GoogleAPIKey);
+                ListViewItem selectedItem = rejectedConnectionsListView.SelectedItems[0];
 
-                    googleMapsForm.ShowDialog();
+                if (selectedItem.Tag is ListViewItemTags tag)
+                {
+                    if (tag.TertiaryObject is IpInfoDetails ipInfoDetails)
+                    {
+                        GoogleMapsForm googleMapsForm = new GoogleMapsForm(ipInfoDetails.Longitude, ipInfoDetails.Latitude, this.ProxyConfig!.GoogleAPIKey);
+
+                        googleMapsForm.ShowDialog();
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError($"Exception: {ex.Message}");
             }
         }
     }
