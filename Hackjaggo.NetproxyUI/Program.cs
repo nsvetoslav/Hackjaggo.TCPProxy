@@ -8,7 +8,6 @@ namespace Hackjaggo.NetproxyUI
         static void Main()
         {
             ApplicationConfiguration.Initialize();
-            Logger.LogInfo("Test");
             Application.Run(new HackjaggoProxyForm());
         }
     }
