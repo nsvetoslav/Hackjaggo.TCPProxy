@@ -4,6 +4,8 @@
     "forwardIp": "192.168.1.5",
     "forwardPort": 25564,
     "FilterIPAddressRanges": true,
+    "enableLogging": false,
+    "requestTimeoutMs": 250,
     "GoogleAPIKey": "",
     "IPAddressRanges": [
       "198.XXX.XXX.X/24",

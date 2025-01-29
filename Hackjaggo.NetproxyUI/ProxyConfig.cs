@@ -9,5 +9,7 @@
         public bool FilterIPAddressRanges { get; set; }
         public List<string> IPAddressRanges { get; set; } = new();
         public string GoogleAPIKey { get; set; } = string.Empty;
+        public bool enableLogging { get; set; }
+        public short requestTimeoutMs { get; set; } 
     }
 }
