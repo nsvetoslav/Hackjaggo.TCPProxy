@@ -1,0 +1,13 @@
+﻿{
+  "http": {
+    "localPort": 25565,
+    "forwardIp": "192.168.1.5",
+    "forwardPort": 25564,
+    "FilterIPAddressRanges": true,
+    "IPAddressRanges": [
+      "198.XXX.XXX.X/24",
+      "104.XXX.X.X/24",
+      "51.XXX.XX.XXX/27"
+    ]
+  }
+}
