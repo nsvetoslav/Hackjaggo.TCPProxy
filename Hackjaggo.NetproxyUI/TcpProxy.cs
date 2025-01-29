@@ -161,8 +161,6 @@ namespace Hackjaggo.Proxy
             localServer.Server.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.IPv6Only, false);
             localServer.Start();
 
-            await form!.AddRejectedConnectionsListViewItemAsync("46.10.8.57", 0);
-            await form!.AddRejectedConnectionsListViewItemAsync("46.10.8.57", 0);
             await form!.AddRejectedConnectionsListViewItemAsync("188.126.94.91", 0);
 
             form!.routingInformationLabel.Text = $"Routing over TCP from [{localIpAddress}]:{config.localPort} to" +
